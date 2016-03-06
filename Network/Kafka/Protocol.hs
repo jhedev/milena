@@ -190,6 +190,7 @@ errorKafka OffsetMetadataTooLargeCode          = 12
 errorKafka OffsetsLoadInProgressCode           = 14
 errorKafka ConsumerCoordinatorNotAvailableCode = 15
 errorKafka NotCoordinatorForConsumerCode       = 16
+errorKafka InvalidTopicCode                    = 17
 
 data KafkaError = NoError -- ^ @0@ No error--it worked!
                 | Unknown -- ^ @-1@ An unexpected server error
@@ -208,6 +209,7 @@ data KafkaError = NoError -- ^ @0@ No error--it worked!
                 | OffsetsLoadInProgressCode -- ^ @14@ The broker returns this error code for an offset fetch request if it is still loading offsets (after a leader change for that offsets topic partition).
                 | ConsumerCoordinatorNotAvailableCode -- ^ @15@ The broker returns this error code for consumer metadata requests or offset commit requests if the offsets topic has not yet been created.
                 | NotCoordinatorForConsumerCode -- ^ @16@ The broker returns this error code if it receives an offset fetch or commit request for a consumer group that it is not a coordinator for.
+                | InvalidTopicCode -- ^ @17@ For a request which attempts to access an invalid topic (e.g. one which has an illegal name), or if an attempt is made to write to an internal topic (such as the consumer offsets topic).
                 deriving (Eq, Show)
 
 instance Serializable KafkaError where
@@ -234,6 +236,7 @@ instance Deserializable KafkaError where
       14   -> return OffsetsLoadInProgressCode
       15   -> return ConsumerCoordinatorNotAvailableCode
       16   -> return NotCoordinatorForConsumerCode
+      17   -> return InvalidTopicCode
       _    -> fail $ "invalid error code: " ++ show x
 
 newtype Request = Request (CorrelationId, ClientId, RequestMessage) deriving (Show, Eq)
